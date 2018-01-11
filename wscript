@@ -28,9 +28,9 @@ def options(ctx):
                    help='do not build shared library')
 
 def configure(conf):
-    conf.load('compiler_c')
-    autowaf.configure(conf)
     autowaf.display_header('Sratom Configuration')
+    conf.load('compiler_c', cache=True)
+    conf.load('autowaf', cache=True)
 
     conf.env.BUILD_SHARED = not Options.options.no_shared
     conf.env.BUILD_STATIC = Options.options.static
@@ -49,6 +49,7 @@ def configure(conf):
     autowaf.set_lib_env(conf, 'sratom', SRATOM_VERSION)
     conf.write_config_header('sratom_config.h', remove=False)
 
+    autowaf.display_summary(conf)
     autowaf.display_msg(conf, "Unit tests", bool(conf.env.BUILD_TESTS))
     print('')
 
@@ -70,7 +71,7 @@ def build(bld):
     if bld.env.MSVC_COMPILER:
         libflags = []
         libs     = []
-        defines  = ['snprintf=_snprintf']
+        defines  = []
 
     # Shared Library
     if bld.env.BUILD_SHARED:
@@ -151,7 +152,17 @@ def test(ctx):
     autowaf.post_test(ctx, APPNAME)
 
 def lint(ctx):
-    subprocess.call('cpplint.py --filter=+whitespace/comments,-whitespace/tab,-whitespace/braces,-whitespace/labels,-build/header_guard,-readability/casting,-readability/todo,-build/include src/* sratom/*', shell=True)
+    "checks code for style issues"
+    import subprocess
+    cmd = ("clang-tidy -p=. -header-filter=.* -checks=\"*," +
+           "-clang-analyzer-alpha.*," +
+           "-google-readability-todo," +
+           "-llvm-header-guard," +
+           "-llvm-include-order," +
+           "-misc-unused-parameters," +
+           "-readability-else-after-return\" " +
+           "$(find .. -name '*.c')")
+    subprocess.call(cmd, cwd='build', shell=True)
 
 def fix_docs(ctx):
     if ctx.cmd == 'build':
