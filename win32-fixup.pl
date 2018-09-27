@@ -4,12 +4,12 @@
 require "../local-paths.lib";
 
 $package_string = "\"sratom 0.6\"";
-$version_string = "\"0.6.1\"";
-$sratom_version = "0.6.1";
+$version_string = "\"0.6.2\"";
+$sratom_version = "0.6.2";
 $major = 0;
 $minor = 6;
-$micro = 1;
-$binary_age = 601;
+$micro = 2;
+$binary_age = 602;
 $interface_age = 0;
 $current_minus_age = 0;
 $gettext_package = "sratom";
