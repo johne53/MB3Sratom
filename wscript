@@ -10,7 +10,7 @@ from waflib.extras import autowaf
 # major increment <=> incompatible changes
 # minor increment <=> compatible changes (additions)
 # micro increment <=> no interface changes
-SRATOM_VERSION       = '0.6.2'
+SRATOM_VERSION       = '0.6.3'
 SRATOM_MAJOR_VERSION = '0'
 
 # Mandatory waf variables
@@ -32,6 +32,7 @@ def configure(conf):
     autowaf.display_header('Sratom Configuration')
     conf.load('compiler_c', cache=True)
     conf.load('autowaf', cache=True)
+    autowaf.set_c_lang(conf, 'c99')
 
     conf.env.BUILD_SHARED = not Options.options.no_shared
     conf.env.BUILD_STATIC = Options.options.static
@@ -153,11 +154,10 @@ def lint(ctx):
     "checks code for style issues"
     import subprocess
     cmd = ("clang-tidy -p=. -header-filter=.* -checks=\"*," +
+           "-bugprone-suspicious-string-compare," +
            "-clang-analyzer-alpha.*," +
-           "-google-readability-todo," +
+           "-hicpp-signed-bitwise," +
            "-llvm-header-guard," +
-           "-llvm-include-order," +
-           "-misc-unused-parameters," +
            "-readability-else-after-return\" " +
            "$(find .. -name '*.c')")
     subprocess.call(cmd, cwd='build', shell=True)
