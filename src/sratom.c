@@ -20,9 +20,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "lv2/atom/forge.h"
-#include "lv2/atom/util.h"
-#include "lv2/midi/midi.h"
+// !!!! These 3 reverted by JE - 25/04/2019
+#include "lv2/lv2plug.in/ns/ext/atom/forge.h"
+#include "lv2/lv2plug.in/ns/ext/atom/util.h"
+#include "lv2/lv2plug.in/ns/ext/midi/midi.h"
 
 #include "sratom/sratom.h"
 
