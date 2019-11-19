@@ -10,7 +10,7 @@ from waflib.extras import autowaf
 # major increment <=> incompatible changes
 # minor increment <=> compatible changes (additions)
 # micro increment <=> no interface changes
-SRATOM_VERSION       = '0.6.3'
+SRATOM_VERSION       = '0.6.4'
 SRATOM_MAJOR_VERSION = '0'
 
 # Mandatory waf variables
@@ -18,6 +18,11 @@ APPNAME = 'sratom'        # Package name for waf dist
 VERSION = SRATOM_VERSION  # Package version for waf dist
 top     = '.'             # Source directory
 out     = 'build'         # Build directory
+
+# Release variables
+uri          = 'http://drobilla.net/sw/sratom'
+dist_pattern = 'http://download.drobilla.net/sratom-%d.%d.%d.tar.bz2'
+post_tags    = ['Hacking', 'LAD', 'LV2', 'RDF', 'Sratom']
 
 def options(ctx):
     ctx.load('compiler_c')
@@ -37,12 +42,9 @@ def configure(conf):
     if not conf.env.BUILD_SHARED and not conf.env.BUILD_STATIC:
         conf.fatal('Neither a shared nor a static build requested')
 
-    autowaf.check_pkg(conf, 'lv2', uselib_store='LV2',
-                      atleast_version='1.16.0', mandatory=True)
-    autowaf.check_pkg(conf, 'serd-0', uselib_store='SERD',
-                      atleast_version='0.30.0', mandatory=True)
-    autowaf.check_pkg(conf, 'sord-0', uselib_store='SORD',
-                      atleast_version='0.14.0', mandatory=True)
+    conf.check_pkg('lv2 >= 1.16.0', uselib_store='LV2')
+    conf.check_pkg('serd-0 >= 0.30.0', uselib_store='SERD')
+    conf.check_pkg('sord-0 >= 0.14.0', uselib_store='SORD')
 
     autowaf.set_lib_env(conf, 'sratom', SRATOM_VERSION)
     conf.write_config_header('sratom_config.h', remove=False)
@@ -57,9 +59,9 @@ def build(bld):
     bld.install_files(includedir, bld.path.ant_glob('sratom/*.h'))
 
     # Pkgconfig file
-    autowaf.build_pc(bld, 'SRATOM', SRATOM_VERSION, SRATOM_MAJOR_VERSION,
-                     ['SERD', 'SORD', 'LV2'],
-                     {'SRATOM_MAJOR_VERSION' : SRATOM_MAJOR_VERSION})
+    autowaf.build_pc(bld, 'SRATOM', SRATOM_VERSION, SRATOM_MAJOR_VERSION, [],
+                     {'SRATOM_MAJOR_VERSION' : SRATOM_MAJOR_VERSION,
+                      'SRATOM_PKG_DEPS' : 'lv2 serd-0 sord-0'})
 
     libflags = ['-fvisibility=hidden']
     libs     = ['m']
@@ -138,7 +140,15 @@ def build(bld):
     bld.add_post_fun(autowaf.run_ldconfig)
 
 def test(tst):
-    tst(['./sratom_test'])
+    import sys
+
+    if sys.platform == 'win32' and '/DNDEBUG' not in tst.env.CFLAGS:
+        # FIXME: Sort out DLL memory freeing situation in next major version
+        Logs.warn("Skipping tests for Windows debug build")
+        return
+
+    with tst.group('Integration') as check:
+        check(['./sratom_test'])
 
 def lint(ctx):
     "checks code for style issues"
@@ -151,17 +161,3 @@ def lint(ctx):
            "-readability-else-after-return\" " +
            "$(find .. -name '*.c')")
     subprocess.call(cmd, cwd='build', shell=True)
-
-def upload_docs(ctx):
-    os.system("rsync -ravz --delete -e ssh build/doc/html/ drobilla@drobilla.net:~/drobilla.net/docs/sratom/")
-
-def posts(ctx):
-    path = str(ctx.path.abspath())
-    autowaf.news_to_posts(
-        os.path.join(path, 'NEWS'),
-        {'title'        : 'Sratom',
-         'description'  : autowaf.get_blurb(os.path.join(path, 'README')),
-         'dist_pattern' : 'http://download.drobilla.net/sratom-%s.tar.bz2'},
-        { 'Author' : 'drobilla',
-          'Tags'   : 'Hacking, LAD, LV2, RDF, Sratom' },
-        os.path.join(out, 'posts'))
