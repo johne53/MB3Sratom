@@ -1,0 +1,12 @@
+Checks: >
+  *,
+  -*-magic-numbers,
+  -*-uppercase-literal-suffix,
+  -bugprone-suspicious-string-compare,
+  -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
+  -hicpp-signed-bitwise,
+  -llvm-header-guard,
+  -llvmlibc-*,
+WarningsAsErrors: '*'
+HeaderFilterRegex: '.*'
+FormatStyle: file

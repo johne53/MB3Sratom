@@ -1,3 +1,21 @@
+sratom (0.6.9) unstable;
+
+  * Fix potential blank node ID truncation
+
+ -- David Robillard <d@drobilla.net>  Sun, 10 Jan 2021 22:10:23 +0000
+
+sratom (0.6.8) stable;
+
+  * Fix potential null pointer dereference
+
+ -- David Robillard <d@drobilla.net>  Thu, 07 Jan 2021 21:36:14 +0000
+
+sratom (0.6.6) stable;
+
+  * Fix various minor warnings and other code quality issues
+
+ -- David Robillard <d@drobilla.net>  Sun, 27 Sep 2020 15:18:12 +0000
+
 sratom (0.6.4) stable;
 
   * Make sratom_free() safe to call on NULL
