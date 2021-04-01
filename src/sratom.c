@@ -16,11 +16,12 @@
 
 #include "sratom/sratom.h"
 
-#include "lv2/atom/atom.h"
-#include "lv2/atom/forge.h"
-#include "lv2/atom/util.h"
-#include "lv2/midi/midi.h"
-#include "lv2/urid/urid.h"
+// JE - 31/03/2021 - These ones don't seem to be needed !!!! (see below...)
+//#include "lv2/atom/atom.h"
+//#include "lv2/atom/forge.h"
+//#include "lv2/atom/util.h"
+//#include "lv2/midi/midi.h"
+//#include "lv2/urid/urid.h"
 
 #include <assert.h>
 #include <ctype.h>
